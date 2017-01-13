@@ -534,4 +534,4 @@ up again in the foreground, run the following command from the $DD_HOME director
     bin/agent
 "
 
-wait $AGENT_PID
+#wait $AGENT_PID
