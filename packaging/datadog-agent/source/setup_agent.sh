@@ -374,6 +374,8 @@ rm -f "$DD_HOME/get-pip.pyc"
 print_done
 
 print_console "* Installing requirements"
+print_console "DD_HOME: $DD_HOME"
+print_console "BASE_GITHUB_URL: $BASE_GITHUB_URL"
 $DOWNLOADER "$DD_HOME/requirements.txt" "$BASE_GITHUB_URL/requirements.txt"
 $VENV_PIP_CMD install -r "$DD_HOME/requirements.txt"
 rm -f "$DD_HOME/requirements.txt"
