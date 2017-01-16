@@ -12,6 +12,7 @@ from docker.errors import NullResource, NotFound
 # project
 from utils.dockerutil import DockerUtil
 from utils.kubernetes import KubeUtil
+from utils.rancher import RancherUtil
 from utils.platform import Platform
 from utils.service_discovery.abstract_sd_backend import AbstractSDBackend
 from utils.service_discovery.config_stores import get_config_store
@@ -82,6 +83,8 @@ class SDDockerBackend(AbstractSDBackend):
         self.docker_client = DockerUtil(config_store=self.config_store).client
         if Platform.is_k8s():
             self.kubeutil = KubeUtil()
+
+        self.rancherutil = RancherUtil()
 
         self.VAR_MAPPING = {
             'host': self._get_host_address,
@@ -216,6 +219,13 @@ class SDDockerBackend(AbstractSDBackend):
                 spec = state.get_kube_container_spec(c_id)
                 if spec:
                     ports = [str(x.get('containerPort')) for x in spec.get('ports', [])]
+
+            if not ports:
+                container_name = container_inspect.get('Config', {}).get('Labels', {})\
+                    .get('io.rancher.container.name', '')
+
+                ports = self.rancherutil.get_ports_for_container(container_name)
+
         ports = sorted(ports, key=int)
         return self._extract_port_from_list(ports, tpl_var)
 
