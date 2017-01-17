@@ -133,7 +133,7 @@ DOG="
 "
 
 LOGFILE="$DD_HOME/ddagent-install.log"
-BASE_GITHUB_URL="https://raw.githubusercontent.com/DataDog/dd-agent/$AGENT_VERSION"
+BASE_GITHUB_URL="https://raw.githubusercontent.com/alextbrandwatch/dd-agent/$AGENT_VERSION"
 
 #######################################################################
 # Error reporting helpers
