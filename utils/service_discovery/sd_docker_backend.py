@@ -167,7 +167,7 @@ class SDDockerBackend(AbstractSDBackend):
         # try to get the IP address from Config/Labels (Rancher 1.2+)
         config_ip_addr = c_inspect.get('Config', {}).get('Labels', {}).get('io.rancher.container.ip', '')
         if config_ip_addr:
-            ip_addr = config_ip_addr.split('/', 0)
+            ip_addr = config_ip_addr.split('/')[0]
             if ip_addr:
                 return ip_addr
 
