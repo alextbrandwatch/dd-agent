@@ -213,15 +213,9 @@ class SDDockerBackend(AbstractSDBackend):
 
         try:
             ports = map(lambda x: x.split('/')[0], container_inspect['NetworkSettings']['Ports'].keys())
-            log.debug("Ports found in NetworkSettings/Ports: %s" % ports)
-            if not ports:
-                log.debug("No ports found in NetworkSettings/Ports, raising KeyError")
-                raise KeyError
         except (IndexError, KeyError, AttributeError):
             # try to get ports from the docker API. Works if the image has an EXPOSE instruction
-            log.debug("Trying to get ports from Config/ExposedPorts:")
             ports = map(lambda x: x.split('/')[0], container_inspect['Config'].get('ExposedPorts', {}).keys())
-            log.debug("Ports found in Config/ExposedPorts: %s" % ports)
 
             # if it failed, try with the kubernetes API
             if not ports and Platform.is_k8s():
@@ -231,14 +225,14 @@ class SDDockerBackend(AbstractSDBackend):
                 if spec:
                     ports = [str(x.get('containerPort')) for x in spec.get('ports', [])]
 
-            if not ports:
-                log.debug("Going for the Rancher API:")
-                container_name = container_inspect.get('Config', {}).get('Labels', {})\
-                    .get('io.rancher.container.name', '')
-                log.debug("Container name: %s" % container_name)
+        if not ports:
+            log.debug("Going for the Rancher API:")
+            container_name = container_inspect.get('Config', {}).get('Labels', {})\
+                .get('io.rancher.container.name', '')
+            log.debug("Container name: %s" % container_name)
 
-                ports = self.rancherutil.get_ports_for_container(container_name)
-                log.debug("Ports found in Rancher API: %s" % ports)
+            ports = self.rancherutil.get_ports_for_container(container_name)
+            log.debug("Ports found in Rancher API: %s" % ports)
 
         ports = sorted(ports, key=int)
         return self._extract_port_from_list(ports, tpl_var)
